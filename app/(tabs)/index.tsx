@@ -1,17 +1,14 @@
 import { StyleSheet, Platform, View } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { Link } from 'expo-router';
-import { Image } from 'expo-image';
 import ImageViewer from '@/components/ImageViewer';
 import Button from '@/components/Button';
 import useImagePicker from '@/hooks/useImagePicker';
 import { useState } from 'react';
 import IconButton from '@/components/IconButton';
 import CircleButton from '@/components/CircleButton';
+import EmojiPicker from '@/components/EmojiPicker';
+import { type ImageSource } from 'expo-image';
+import EmojiList from '@/components/EmojiList';
+import EmojiSticker from '@/components/EmojiSticker';
 
 const PlaceholderImage = require('@/assets/images/background-image.png');
 
@@ -22,6 +19,8 @@ export default function HomeScreen() {
   } = useImagePicker();
 
   const [showAppOptions, setShowAppOptions] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [pickedEmoji, setPickedEmoji] = useState<ImageSource | null>(null);
 
 
   async function handleImagePicker() {
@@ -36,7 +35,11 @@ export default function HomeScreen() {
   }
 
   function onAddSticker() {
+    setIsModalVisible(true);
+  }
 
+  function onModalClose() {
+    setIsModalVisible(false);
   }
 
   async function onSaveImageAsync() {
@@ -47,6 +50,9 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <View style={styles.imageContainer}>
         <ImageViewer imgSource={image ?? PlaceholderImage} />
+        {pickedEmoji && (
+          <EmojiSticker imageSize={40} stickerSource={pickedEmoji} />
+        )}
       </View>
       {
         showAppOptions ? (
@@ -64,6 +70,9 @@ export default function HomeScreen() {
           </View>
         )
       }
+      <EmojiPicker isVisible={isModalVisible} onClose={onModalClose}>
+        <EmojiList onSelect={setPickedEmoji} onCloseModal={onModalClose} />
+      </EmojiPicker>
     </View>
   );
 }
